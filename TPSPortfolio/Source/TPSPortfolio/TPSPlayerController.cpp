@@ -3,3 +3,19 @@
 
 #include "TPSPlayerController.h"
 
+void ATPSPlayerController::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+}
+
+void ATPSPlayerController::OnPossess(APawn* aPawn)
+{
+	Super::OnPossess(aPawn);
+}
+
+void ATPSPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+
+}

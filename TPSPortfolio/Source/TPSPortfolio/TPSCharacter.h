@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "TPSPortfolio.h"
 #include "GameFramework/Character.h"
+#include "InputActionValue.h"
 #include "TPSCharacter.generated.h"
 
 UCLASS()
@@ -26,4 +27,24 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+protected:
+	void Sight(const FInputActionValue& Value);
+	void Move(const FInputActionValue& Value);
+
+private:
+	UPROPERTY(VisibleAnywhere, Category = Camera)
+	USpringArmComponent* SpringArm;
+
+	UPROPERTY(VisibleAnywhere, Category = Camera)
+	UCameraComponent* Camera;
+
+	// 입력 매핑
+	UPROPERTY(VisibleAnywhere, Category = Input)
+	class UInputMappingContext* DefaultContext;
+
+	UPROPERTY(VisibleAnywhere, Category = Input)
+	class UInputAction* SightAction;
+
+	UPROPERTY(VisibleAnywhere, Category = Input)
+	class UInputAction* MoveAction;
 };

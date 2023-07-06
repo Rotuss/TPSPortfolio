@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "TPSPortfolio.h"
 #include "GameFramework/GameModeBase.h"
 #include "TPSGameMode.generated.h"
 
@@ -13,5 +13,6 @@ UCLASS()
 class TPSPORTFOLIO_API ATPSGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+
+	ATPSGameMode();
 };

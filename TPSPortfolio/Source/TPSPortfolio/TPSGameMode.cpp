@@ -2,4 +2,11 @@
 
 
 #include "TPSGameMode.h"
+#include "TPSCharacter.h"
+#include "TPSPlayerController.h"
 
+ATPSGameMode::ATPSGameMode()
+{
+	DefaultPawnClass = ATPSCharacter::StaticClass();
+	PlayerControllerClass = ATPSPlayerController::StaticClass();
+}
