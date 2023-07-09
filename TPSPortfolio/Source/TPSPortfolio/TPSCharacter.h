@@ -30,6 +30,7 @@ public:
 protected:
 	void Sight(const FInputActionValue& Value);
 	void Move(const FInputActionValue& Value);
+	//void Jump(const FInputActionValue& Value);
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -47,4 +48,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputAction* MoveAction;
+
+	UPROPERTY(VisibleAnywhere, Category = Input)
+	class UInputAction* JumpAction;
 };
