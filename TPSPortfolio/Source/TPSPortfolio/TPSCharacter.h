@@ -7,6 +7,8 @@
 #include "InputActionValue.h"
 #include "TPSCharacter.generated.h"
 
+class ATPSWeapon;
+
 UCLASS()
 class TPSPORTFOLIO_API ATPSCharacter : public ACharacter
 {
@@ -30,7 +32,8 @@ public:
 protected:
 	void Sight(const FInputActionValue& Value);
 	void Move(const FInputActionValue& Value);
-	//void Jump(const FInputActionValue& Value);
+	
+	void Shoot(const FInputActionValue& Value);
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -38,6 +41,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	UCameraComponent* Camera;
+
+	UPROPERTY(VisibleAnywhere, Category = Weapon)
+	USkeletalMeshComponent* Weapon;
 
 	// 입력 매핑
 	UPROPERTY(VisibleAnywhere, Category = Input)
@@ -51,4 +57,11 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputAction* JumpAction;
+
+	UPROPERTY(VisibleAnywhere, Category = Input)
+	class UInputAction* ShootAction;
+
+	UPROPERTY()
+	ATPSWeapon* CurWeapon;
+
 };

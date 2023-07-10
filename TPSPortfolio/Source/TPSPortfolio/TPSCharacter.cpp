@@ -6,6 +6,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
 #include "TPSAnimInstance.h"
+#include "TPSWeapon.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values
 ATPSCharacter::ATPSCharacter()
@@ -79,6 +81,13 @@ ATPSCharacter::ATPSCharacter()
 	{
 		JumpAction = IA_CharacterJump.Object;
 	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_CharacterShoot
+	(TEXT("/Game/Input/IA_CharacterShoot.IA_CharacterShoot"));
+	if (true == IA_CharacterShoot.Succeeded())
+	{
+		ShootAction = IA_CharacterShoot.Object;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -92,6 +101,14 @@ void ATPSCharacter::BeginPlay()
 		{
 			SubSystem->AddMappingContext(DefaultContext, 0);
 		}
+	}
+
+	FName WeaponSocket(TEXT("hand_rSocket"));
+	CurWeapon = GetWorld()->SpawnActor<ATPSWeapon>(FVector::ZeroVector, FRotator::ZeroRotator);
+	if (nullptr != CurWeapon)
+	{
+		CurWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, WeaponSocket);
+		CurWeapon->SetOwner(this);
 	}
 }
 
@@ -118,6 +135,7 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		EnhancedInputComponent->BindAction(SightAction, ETriggerEvent::Triggered, this, &ATPSCharacter::Sight);
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATPSCharacter::Move);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Started, this, &ATPSCharacter::Shoot);
 	}
 }
 
@@ -145,15 +163,14 @@ void ATPSCharacter::Move(const FInputActionValue& Value)
 	}
 }
 
-//void ATPSCharacter::Jump(const FInputActionValue& Value)
-//{
-//	if (true == Value.Get<bool>())
-//	{
-//		//const FVector2D MovementVector = Value.Get<FVector2D>();
-//		//AddMovementInput(FRotationMatrix(FRotationMatrix(FRotator(0.0f, GetControlRotation().Yaw, 0.0f))).GetUnitAxis(EAxis::X), MovementVector.Y);
-//		//AddMovementInput(FRotationMatrix(FRotationMatrix(FRotator(0.0f, GetControlRotation().Yaw, 0.0f))).GetUnitAxis(EAxis::Y), MovementVector.X);
-//		Super::Jump();
-//		//UE_LOG(LogTemp, Warning, TEXT("Input MoveAction"));
-//	}
-//}
+void ATPSCharacter::Shoot(const FInputActionValue& Value)
+{
+	if (true == Value.Get<bool>())
+	{
+		if (nullptr != CurWeapon)
+		{
+			CurWeapon->PullTrigger();
+		}
+	}
+}
 
