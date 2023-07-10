@@ -2,7 +2,7 @@
 
 
 #include "TPSWeapon.h"
-//#include "Kismet/GameplayStatics.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ATPSWeapon::ATPSWeapon()
@@ -19,8 +19,12 @@ ATPSWeapon::ATPSWeapon()
 	WeaponMeshComp->SetCollisionProfileName(FName("Weapon"));
 	RootComponent = WeaponMeshComp;
 
-	//MuzzleFlashEffect = CreateDefaultSubobject<UParticleSystem>(TEXT("MUZZLEFLASHEFFECT"));
-	//static ConstructorHelpers::FObjectFinder<UParticleSystem> P_CHESTOPEN(TEXT("ParticleSystem'/Game/Realistic_Starter_VFX_Pack_Vol2/Particles/Hit/P_Default.P_Default'"));
+	MuzzleFlashEffect = CreateDefaultSubobject<UParticleSystem>(TEXT("MUZZLEFLASHEFFECT"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> P_WEAPONEMITTER(TEXT("ParticleSystem'/Game/Realistic_Starter_VFX_Pack_Vol2/Particles/Hit/P_Default.P_Default'"));
+	if (P_WEAPONEMITTER.Succeeded())
+	{
+		MuzzleFlashEffect = P_WEAPONEMITTER.Object;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -39,8 +43,8 @@ void ATPSWeapon::Tick(float DeltaTime)
 
 void ATPSWeapon::PullTrigger()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Weapon Trigger Check"));
+	UGameplayStatics::SpawnEmitterAttached(MuzzleFlashEffect, WeaponMeshComp, TEXT("b_gun_muzzleflash"));
 	
-	//UGameplayStatics::SpawnEmitterAttached(MuzzleFlashEffect, WeaponMeshComp, TEXT("b_gun_muzzleflash"));
+	//UE_LOG(LogTemp, Warning, TEXT("Weapon Trigger Check"));
 }
 
