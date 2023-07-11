@@ -48,9 +48,15 @@ void ATPSWeapon::PullTrigger()
 {
 	UGameplayStatics::SpawnEmitterAttached(MuzzleFlashEffect, WeaponMeshComp, TEXT("b_gun_muzzleflash"));
 	
-	// 라인트레이스 총구 방향? 뷰포트 방향?
-	/*FRotator Rotation = GetActorRotation();
-	FVector Location = GetActorLocation() + Rotation.Vector().ForwardVector * 100;
+	// 라인트레이스 총구 방향? 뷰포트 방향? -> 우선 총구(위치) 및 플레이어(회전) 방향
+	APawn* OwnerPawn = Cast<APawn>(GetOwner());
+	if (nullptr == OwnerPawn)
+	{
+		return;
+	}
+
+	FVector Location = WeaponMeshComp->GetSocketLocation(TEXT("b_gun_muzzleflash"));
+	FRotator Rotation = OwnerPawn->GetActorRotation();
 	FVector End = Location + Rotation.Vector() * MaxRange;
 
 	FHitResult Hit;
@@ -58,7 +64,8 @@ void ATPSWeapon::PullTrigger()
 	if (true == bSuccess)
 	{
 		DrawDebugPoint(GetWorld(), Hit.Location, 20, FColor::Red, true);
-	}*/
+	}
+
 	//UE_LOG(LogTemp, Warning, TEXT("Weapon Trigger Check"));
 }
 
