@@ -3,6 +3,7 @@
 
 #include "TPSWeapon.h"
 #include "Kismet/GameplayStatics.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values
 ATPSWeapon::ATPSWeapon()
@@ -25,6 +26,8 @@ ATPSWeapon::ATPSWeapon()
 	{
 		MuzzleFlashEffect = P_WEAPONEMITTER.Object;
 	}
+
+	MaxRange = 1000.0f;
 }
 
 // Called when the game starts or when spawned
@@ -45,6 +48,17 @@ void ATPSWeapon::PullTrigger()
 {
 	UGameplayStatics::SpawnEmitterAttached(MuzzleFlashEffect, WeaponMeshComp, TEXT("b_gun_muzzleflash"));
 	
+	// 라인트레이스 총구 방향? 뷰포트 방향?
+	/*FRotator Rotation = GetActorRotation();
+	FVector Location = GetActorLocation() + Rotation.Vector().ForwardVector * 100;
+	FVector End = Location + Rotation.Vector() * MaxRange;
+
+	FHitResult Hit;
+	bool bSuccess = GetWorld()->LineTraceSingleByChannel(Hit, Location, End, ECollisionChannel::ECC_GameTraceChannel2);
+	if (true == bSuccess)
+	{
+		DrawDebugPoint(GetWorld(), Hit.Location, 20, FColor::Red, true);
+	}*/
 	//UE_LOG(LogTemp, Warning, TEXT("Weapon Trigger Check"));
 }
 

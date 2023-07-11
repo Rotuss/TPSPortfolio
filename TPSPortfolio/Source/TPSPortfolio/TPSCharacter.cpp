@@ -7,7 +7,6 @@
 #include "InputMappingContext.h"
 #include "TPSAnimInstance.h"
 #include "TPSWeapon.h"
-#include "DrawDebugHelpers.h"
 
 // Sets default values
 ATPSCharacter::ATPSCharacter()

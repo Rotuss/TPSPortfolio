@@ -31,4 +31,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Effect)
 	UParticleSystem* MuzzleFlashEffect;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	float MaxRange;
 };
