@@ -27,6 +27,13 @@ ATPSWeapon::ATPSWeapon()
 		MuzzleFlashEffect = P_WEAPONEMITTER.Object;
 	}
 
+	WeaponHitEffect = CreateDefaultSubobject<UParticleSystem>(TEXT("WEAPONHITEFFECT"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> P_HITMITTER(TEXT("ParticleSystem'/Game/Realistic_Starter_VFX_Pack_Vol2/Particles/Blood/P_Blood_Splat_Cone.P_Blood_Splat_Cone'"));
+	if (P_HITMITTER.Succeeded())
+	{
+		WeaponHitEffect = P_HITMITTER.Object;
+	}
+
 	MaxRange = 1000.0f;
 }
 
@@ -63,7 +70,8 @@ void ATPSWeapon::PullTrigger()
 	bool bSuccess = GetWorld()->LineTraceSingleByChannel(Hit, Location, End, ECollisionChannel::ECC_GameTraceChannel2);
 	if (true == bSuccess)
 	{
-		DrawDebugPoint(GetWorld(), Hit.Location, 20, FColor::Red, true);
+		//DrawDebugPoint(GetWorld(), Hit.Location, 20, FColor::Red, true);
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), WeaponHitEffect, Hit.ImpactPoint, Rotation + FRotator(90.0, 0.0, 0.0));
 	}
 
 	//UE_LOG(LogTemp, Warning, TEXT("Weapon Trigger Check"));

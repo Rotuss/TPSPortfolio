@@ -32,6 +32,9 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Effect)
 	UParticleSystem* MuzzleFlashEffect;
 
+	UPROPERTY(VisibleAnywhere, Category = Effect)
+	UParticleSystem* WeaponHitEffect;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	float MaxRange;
 };
