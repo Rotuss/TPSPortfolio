@@ -8,6 +8,10 @@
 #include "TPSAnimInstance.h"
 #include "TPSWeapon.h"
 
+// 서버
+#include "Net/UnrealNetwork.h"
+#include "Engine/Engine.h"
+
 // Sets default values
 ATPSCharacter::ATPSCharacter()
 {
@@ -87,6 +91,41 @@ ATPSCharacter::ATPSCharacter()
 	{
 		ShootAction = IA_CharacterShoot.Object;
 	}
+
+	// 서버
+	MaxHealth = 100.0f;
+	CurrentHealth = MaxHealth;
+
+	// 발사 속도 초기화
+	FireRate = 0.25f;
+	bIsFiringWeapon = false;
+}
+
+// 서버
+void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	//현재 체력 리플리케이트
+	DOREPLIFETIME(ATPSCharacter, CurrentHealth);
+}
+
+// 서버
+void ATPSCharacter::SetCurrentHealth(float healthValue)
+{
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		CurrentHealth = FMath::Clamp(healthValue, 0.f, MaxHealth);
+		OnHealthUpdate();
+	}
+}
+
+// 서버
+float ATPSCharacter::TakeDamage(float DamageTaken, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float damageApplied = CurrentHealth - DamageTaken;
+	SetCurrentHealth(damageApplied);
+	return damageApplied;
 }
 
 // Called when the game starts or when spawned
@@ -134,7 +173,8 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		EnhancedInputComponent->BindAction(SightAction, ETriggerEvent::Triggered, this, &ATPSCharacter::Sight);
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATPSCharacter::Move);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Started, this, &ATPSCharacter::Shoot);
+		//EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Started, this, &ATPSCharacter::Shoot);
+		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Started, this, &ATPSCharacter::StartFire);
 	}
 }
 
@@ -170,6 +210,67 @@ void ATPSCharacter::Shoot(const FInputActionValue& Value)
 		{
 			CurWeapon->PullTrigger();
 		}
+	}
+}
+
+// 서버
+void ATPSCharacter::OnRep_CurrentHealth()
+{
+	OnHealthUpdate();
+}
+
+// 서버
+void ATPSCharacter::OnHealthUpdate()
+{
+	// 클라이언트 전용 함수 기능
+	if (true == IsLocallyControlled())
+	{
+		FString healthMessage = FString::Printf(TEXT("You now have %f health remaining."), CurrentHealth);
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, healthMessage);
+
+		if (CurrentHealth <= 0)
+		{
+			FString deathMessage = FString::Printf(TEXT("You have been killed."));
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, deathMessage);
+		}
+	}
+
+	// 서버 전용 함수 기능
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		FString healthMessage = FString::Printf(TEXT("%s now has %f health remaining."), *GetFName().ToString(), CurrentHealth);
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, healthMessage);
+	}
+
+	// 모든 머신에서 실행되는 함수 
+	/*
+		여기에 대미지 또는 사망의 결과로 발생하는 특별 함수 기능 배치
+	*/
+}
+
+// 서버
+void ATPSCharacter::StartFire(const FInputActionValue& Value)
+{
+	if (true == Value.Get<bool>() && false == bIsFiringWeapon)
+	{
+		bIsFiringWeapon = true;
+		GetWorld()->GetTimerManager().SetTimer(FiringTimer, this, &ATPSCharacter::StopFire, FireRate, false);
+		HandleFire();
+	}
+}
+
+// 서버
+void ATPSCharacter::StopFire()
+{
+	bIsFiringWeapon = false;
+}
+
+// 서버
+void ATPSCharacter::HandleFire_Implementation()
+{
+	if (nullptr != CurWeapon)
+	{
+		CurWeapon->PullTrigger();
 	}
 }
 

@@ -4,6 +4,7 @@
 #include "TPSWeapon.h"
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
+#include "TPSAmmo.h"
 
 // Sets default values
 ATPSWeapon::ATPSWeapon()
@@ -66,13 +67,19 @@ void ATPSWeapon::PullTrigger()
 	FRotator Rotation = OwnerPawn->GetActorRotation();
 	FVector End = Location + Rotation.Vector() * MaxRange;
 
-	FHitResult Hit;
-	bool bSuccess = GetWorld()->LineTraceSingleByChannel(Hit, Location, End, ECollisionChannel::ECC_GameTraceChannel2);
-	if (true == bSuccess)
-	{
-		//DrawDebugPoint(GetWorld(), Hit.Location, 20, FColor::Red, true);
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), WeaponHitEffect, Hit.ImpactPoint, Rotation + FRotator(90.0, 0.0, 0.0));
-	}
+	FActorSpawnParameters spawnParameters;
+	spawnParameters.Instigator = OwnerPawn->GetInstigator();
+	spawnParameters.Owner = OwnerPawn;
+
+	ATPSAmmo* spawnedProjectile = GetWorld()->SpawnActor<ATPSAmmo>(Location + Location.ForwardVector * 50.0f, End.Rotation(), spawnParameters);
+
+	//FHitResult Hit;
+	//bool bSuccess = GetWorld()->LineTraceSingleByChannel(Hit, Location, End, ECollisionChannel::ECC_GameTraceChannel2);
+	//if (true == bSuccess)
+	//{
+	//	//DrawDebugPoint(GetWorld(), Hit.Location, 20, FColor::Red, true);
+	//	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), WeaponHitEffect, Hit.ImpactPoint, Rotation + FRotator(90.0, 0.0, 0.0));
+	//}
 
 	//UE_LOG(LogTemp, Warning, TEXT("Weapon Trigger Check"));
 }
