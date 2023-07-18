@@ -22,15 +22,17 @@ ATPSCharacter::ATPSCharacter()
 
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -90.0f), FRotator(0.0f, -90.0f, 0.0f));
 
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_CHARACTER(TEXT("SkeletalMesh'/Game/Characters/Mannequins/Meshes/SKM_Quinn.SKM_Quinn'"));
+	//static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_CHARACTER(TEXT("SkeletalMesh'/Game/Characters/Mannequins/Meshes/SKM_Quinn.SKM_Quinn'"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_CHARACTER(TEXT("SkeletalMesh'/Game/Characters/TPS/TPSCharacter/Swat.Swat'"));
 	if (true == SK_CHARACTER.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(SK_CHARACTER.Object);
 	}
 
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-
-	static ConstructorHelpers::FClassFinder<UAnimInstance> BP_CHARACTER_ANIM(TEXT("AnimBlueprint'/Game/Characters/TPS/Animation/ABP_TPS.ABP_TPS_C'"));
+	
+	//static ConstructorHelpers::FClassFinder<UAnimInstance> BP_CHARACTER_ANIM(TEXT("AnimBlueprint'/Game/Characters/TPS/Animation/ABP_TPS.ABP_TPS_C'"));
+	static ConstructorHelpers::FClassFinder<UAnimInstance> BP_CHARACTER_ANIM(TEXT("AnimBlueprint'/Game/Characters/TPS/Animation/ABP_TPSCharacter.ABP_TPSCharacter_C'"));
 	if (BP_CHARACTER_ANIM.Succeeded())
 	{
 		GetMesh()->SetAnimInstanceClass(BP_CHARACTER_ANIM.Class);
@@ -39,17 +41,15 @@ ATPSCharacter::ATPSCharacter()
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SPRINGARM"));
 	SpringArm->SetupAttachment(GetCapsuleComponent());
 	SpringArm->TargetArmLength = 200.0f;
-	SpringArm->SetRelativeLocation(FVector(0.0f, 0.0f, 100.0f));
-	SpringArm->SetRelativeRotation(FRotator(-15.0f, 0.0f, 0.0f));
+	SpringArm->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, 100.0f), FRotator(0.0f, -50.0f, 0.0f));
 	// 폰 제어 회전 사용
 	SpringArm->bUsePawnControlRotation = true;
+	SpringArm->bInheritPitch = true;
+	SpringArm->bInheritYaw = true;
+	SpringArm->bInheritRoll = false;
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("CAMERA"));
 	Camera->SetupAttachment(SpringArm);
-
-	bUseControllerRotationRoll = false;
-	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
 
 	// 무브먼트 방향으로 회전 조정
 	GetCharacterMovement()->bOrientRotationToMovement = true;

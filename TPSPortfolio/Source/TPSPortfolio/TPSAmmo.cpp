@@ -48,6 +48,7 @@ ATPSAmmo::ATPSAmmo()
 		StaticMesh->SetRelativeScale3D(FVector(5.0f, 5.0f, 5.0f));
 	}
 
+	/*ParticleSystem'/Game/Realistic_Starter_VFX_Pack_Vol2/Particles/Blood/P_Blood_Splat_Cone.P_Blood_Splat_Cone'*/
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> DefaultExplosionEffect(TEXT("ParticleSystem'/Game/Realistic_Starter_VFX_Pack_Vol2/Particles/Hit/P_Default.P_Default'"));
 	if (true == DefaultExplosionEffect.Succeeded())
 	{

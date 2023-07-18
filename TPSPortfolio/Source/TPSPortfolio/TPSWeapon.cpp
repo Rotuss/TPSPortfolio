@@ -26,13 +26,6 @@ ATPSWeapon::ATPSWeapon()
 	if (P_WEAPONEMITTER.Succeeded())
 	{
 		MuzzleFlashEffect = P_WEAPONEMITTER.Object;
-	}
-
-	WeaponHitEffect = CreateDefaultSubobject<UParticleSystem>(TEXT("WEAPONHITEFFECT"));
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> P_HITMITTER(TEXT("ParticleSystem'/Game/Realistic_Starter_VFX_Pack_Vol2/Particles/Blood/P_Blood_Splat_Cone.P_Blood_Splat_Cone'"));
-	if (P_HITMITTER.Succeeded())
-	{
-		WeaponHitEffect = P_HITMITTER.Object;
 	}*/
 
 	MaxRange = 1000.0f;
