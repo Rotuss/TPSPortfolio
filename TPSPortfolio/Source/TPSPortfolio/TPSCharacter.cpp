@@ -38,7 +38,8 @@ ATPSCharacter::ATPSCharacter()
 	
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SPRINGARM"));
 	SpringArm->SetupAttachment(GetCapsuleComponent());
-	SpringArm->TargetArmLength = 400.0f;
+	SpringArm->TargetArmLength = 200.0f;
+	SpringArm->SetRelativeLocation(FVector(0.0f, 0.0f, 100.0f));
 	SpringArm->SetRelativeRotation(FRotator(-15.0f, 0.0f, 0.0f));
 	// 폰 제어 회전 사용
 	SpringArm->bUsePawnControlRotation = true;

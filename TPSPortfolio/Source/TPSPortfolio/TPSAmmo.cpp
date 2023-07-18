@@ -24,7 +24,7 @@ ATPSAmmo::ATPSAmmo()
 
 	// 발사체와 콜리전의 루트 컴포넌트 역할을 할 SphereComponent 정의
 	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("RootComponent"));
-	SphereComponent->InitSphereRadius(37.5f);
+	SphereComponent->InitSphereRadius(3.0f);
 	SphereComponent->SetCollisionProfileName(TEXT("BlockAllDynamic"));
 	RootComponent = SphereComponent;
 
@@ -35,7 +35,7 @@ ATPSAmmo::ATPSAmmo()
 	}
 
 	// 비주얼 표현을 담당할 메시 정의
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> DefaultMesh(TEXT("StaticMesh'/Engine/EngineMeshes/Sphere.Sphere'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> DefaultMesh(TEXT("StaticMesh'/Game/FPS_Weapon_Bundle/Weapons/Meshes/Ammunition/SM_Shell_762x39.SM_Shell_762x39'"));
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	StaticMesh->SetupAttachment(RootComponent);
 
@@ -43,8 +43,9 @@ ATPSAmmo::ATPSAmmo()
 	if (true == DefaultMesh.Succeeded())
 	{
 		StaticMesh->SetStaticMesh(DefaultMesh.Object);
-		StaticMesh->SetRelativeLocation(FVector(0.0f, 0.0f, -37.5f));
-		StaticMesh->SetRelativeScale3D(FVector(0.75f, 0.75f, 0.75f));
+		StaticMesh->SetRelativeLocation(FVector(0.0f, 0.0f, -3.0f));
+		StaticMesh->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
+		StaticMesh->SetRelativeScale3D(FVector(5.0f, 5.0f, 5.0f));
 	}
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> DefaultExplosionEffect(TEXT("ParticleSystem'/Game/Realistic_Starter_VFX_Pack_Vol2/Particles/Hit/P_Default.P_Default'"));
@@ -76,7 +77,7 @@ void ATPSAmmo::BeginPlay()
 void ATPSAmmo::Destroyed()
 {
 	FVector spawnLocation = GetActorLocation();
-	UGameplayStatics::SpawnEmitterAtLocation(this, ExplosionEffect, spawnLocation, FRotator::ZeroRotator, true, EPSCPoolMethod::AutoRelease);
+	UGameplayStatics::SpawnEmitterAtLocation(this, ExplosionEffect, spawnLocation, GetActorRotation() + FRotator(90.0, 0.0, 0.0), true, EPSCPoolMethod::AutoRelease);
 }
 
 void ATPSAmmo::OnProjectileImpact(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)

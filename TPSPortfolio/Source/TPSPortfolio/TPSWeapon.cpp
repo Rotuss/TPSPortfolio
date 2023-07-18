@@ -21,7 +21,7 @@ ATPSWeapon::ATPSWeapon()
 	WeaponMeshComp->SetCollisionProfileName(FName("Weapon"));
 	RootComponent = WeaponMeshComp;
 
-	MuzzleFlashEffect = CreateDefaultSubobject<UParticleSystem>(TEXT("MUZZLEFLASHEFFECT"));
+	/*MuzzleFlashEffect = CreateDefaultSubobject<UParticleSystem>(TEXT("MUZZLEFLASHEFFECT"));
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> P_WEAPONEMITTER(TEXT("ParticleSystem'/Game/Realistic_Starter_VFX_Pack_Vol2/Particles/Hit/P_Default.P_Default'"));
 	if (P_WEAPONEMITTER.Succeeded())
 	{
@@ -33,7 +33,7 @@ ATPSWeapon::ATPSWeapon()
 	if (P_HITMITTER.Succeeded())
 	{
 		WeaponHitEffect = P_HITMITTER.Object;
-	}
+	}*/
 
 	MaxRange = 1000.0f;
 }
@@ -54,7 +54,7 @@ void ATPSWeapon::Tick(float DeltaTime)
 
 void ATPSWeapon::PullTrigger()
 {
-	UGameplayStatics::SpawnEmitterAttached(MuzzleFlashEffect, WeaponMeshComp, TEXT("b_gun_muzzleflash"));
+	//UGameplayStatics::SpawnEmitterAttached(MuzzleFlashEffect, WeaponMeshComp, TEXT("b_gun_muzzleflash"));
 	
 	// 라인트레이스 총구 방향? 뷰포트 방향? -> 우선 총구(위치) 및 플레이어(회전) 방향
 	APawn* OwnerPawn = Cast<APawn>(GetOwner());
@@ -71,7 +71,7 @@ void ATPSWeapon::PullTrigger()
 	spawnParameters.Instigator = OwnerPawn->GetInstigator();
 	spawnParameters.Owner = OwnerPawn;
 
-	ATPSAmmo* spawnedProjectile = GetWorld()->SpawnActor<ATPSAmmo>(Location + Location.ForwardVector * 50.0f, End.Rotation(), spawnParameters);
+	ATPSAmmo* spawnedProjectile = GetWorld()->SpawnActor<ATPSAmmo>(Location, Rotation, spawnParameters);
 
 	//FHitResult Hit;
 	//bool bSuccess = GetWorld()->LineTraceSingleByChannel(Hit, Location, End, ECollisionChannel::ECC_GameTraceChannel2);

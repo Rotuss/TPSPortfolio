@@ -29,11 +29,11 @@ private:
 	UPROPERTY(EditAnywhere, Category = Mesh)
 	USkeletalMeshComponent* WeaponMeshComp;
 
-	UPROPERTY(VisibleAnywhere, Category = Effect)
+	/*UPROPERTY(VisibleAnywhere, Category = Effect)
 	UParticleSystem* MuzzleFlashEffect;
 
 	UPROPERTY(VisibleAnywhere, Category = Effect)
-	UParticleSystem* WeaponHitEffect;
+	UParticleSystem* WeaponHitEffect;*/
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	float MaxRange;
