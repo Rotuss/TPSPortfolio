@@ -18,14 +18,14 @@ void UTPSAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
     auto Pawn = TryGetPawnOwner();
     if (true == IsValid(Pawn))
     {
-        //Speed = Pawn->GetVelocity().Size();
+        Speed = Pawn->GetVelocity().Size2D();
 
         auto Character = Cast<ACharacter>(Pawn);
         if (true == IsValid(Character))
         {
             Velocity = Character->GetMovementComponent()->Velocity;
-            Speed = Velocity.Size2D();
-            CanMove = Speed > 3.0f ? true : false;
+            //Speed = Velocity.Size2D();
+            CanMove = Speed > 0.0f ? true : false;
             IsJumping = Character->GetMovementComponent()->IsFalling();
         }
     }

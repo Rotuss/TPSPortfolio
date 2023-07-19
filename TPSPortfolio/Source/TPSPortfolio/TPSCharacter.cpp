@@ -56,6 +56,7 @@ ATPSCharacter::ATPSCharacter()
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 	// 점프 높이 조정
 	GetCharacterMovement()->JumpZVelocity = 800.0f;
+	GetCharacterMovement()->MaxWalkSpeed = 300.0f;
 
 	// 입력 매핑
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext>DEFAULT_CONTEXT
@@ -77,6 +78,13 @@ ATPSCharacter::ATPSCharacter()
 	if (true == IA_CharacterMove.Succeeded())
 	{
 		MoveAction = IA_CharacterMove.Object;
+	}
+	
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_CharacterWalkRun
+	(TEXT("/Game/Input/IA_CharacterRun.IA_CharacterRun"));
+	if (true == IA_CharacterWalkRun.Succeeded())
+	{
+		WalkRunAction = IA_CharacterWalkRun.Object;
 	}
 
 	static ConstructorHelpers::FObjectFinder<UInputAction>IA_CharacterJump
@@ -156,12 +164,15 @@ void ATPSCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	auto TPSAnimInstance = Cast<UTPSAnimInstance>(GetMesh()->GetAnimInstance());
+	/*auto TPSAnimInstance = Cast<UTPSAnimInstance>(GetMesh()->GetAnimInstance());
 	if (nullptr != TPSAnimInstance)
 	{
 		TPSAnimInstance->SetSpeed(GetVelocity().Size());
-	}
+	}*/
 
+
+	//UE_LOG(LogTemp, Warning, TEXT("MainMaxWalkSpeed : %f"), GetCharacterMovement()->MaxWalkSpeed);
+	UE_LOG(LogTemp, Warning, TEXT("Owner : %s"), *GetOwner()->GetName());
 }
 
 // Called to bind functionality to input
@@ -173,6 +184,8 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	{
 		EnhancedInputComponent->BindAction(SightAction, ETriggerEvent::Triggered, this, &ATPSCharacter::Sight);
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATPSCharacter::Move);
+		EnhancedInputComponent->BindAction(WalkRunAction, ETriggerEvent::Started, this, &ATPSCharacter::Run);
+		EnhancedInputComponent->BindAction(WalkRunAction, ETriggerEvent::Completed, this, &ATPSCharacter::Walk);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
 		//EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Started, this, &ATPSCharacter::Shoot);
 		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Started, this, &ATPSCharacter::StartFire);
@@ -200,6 +213,23 @@ void ATPSCharacter::Move(const FInputActionValue& Value)
 		AddMovementInput(FRotationMatrix(FRotationMatrix(FRotator(0.0f, GetControlRotation().Yaw, 0.0f))).GetUnitAxis(EAxis::Y), MovementVector.X);
 
 		//UE_LOG(LogTemp, Warning, TEXT("Input MoveAction"));
+	}
+}
+
+void ATPSCharacter::Walk(const FInputActionValue& Value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Walk"));
+	GetCharacterMovement()->MaxWalkSpeed = 300.0f;
+	UE_LOG(LogTemp, Warning, TEXT("WalkMaxWalkSpeed : %f"), GetCharacterMovement()->MaxWalkSpeed);
+}
+
+void ATPSCharacter::Run(const FInputActionValue& Value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Run"));
+	if (true == Value.Get<bool>())
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+		UE_LOG(LogTemp, Warning, TEXT("RunMaxWalkSpeed : %f"), GetCharacterMovement()->MaxWalkSpeed);
 	}
 }
 

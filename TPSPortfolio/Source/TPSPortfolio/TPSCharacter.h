@@ -54,7 +54,8 @@ public:
 protected:
 	void Sight(const FInputActionValue& Value);
 	void Move(const FInputActionValue& Value);
-	
+	void Walk(const FInputActionValue& Value);
+	void Run(const FInputActionValue& Value);
 	void Shoot(const FInputActionValue& Value);
 
 	//========================================================================
@@ -120,6 +121,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputAction* MoveAction;
+
+	UPROPERTY(VisibleAnywhere, Category = Input)
+	class UInputAction* WalkRunAction;
 
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputAction* JumpAction;
