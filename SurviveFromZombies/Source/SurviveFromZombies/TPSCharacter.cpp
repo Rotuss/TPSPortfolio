@@ -6,6 +6,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
 #include "TPSAnimInstance.h"
+#include "Sound/SoundCue.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ATPSCharacter::ATPSCharacter()
@@ -25,6 +27,13 @@ ATPSCharacter::ATPSCharacter()
 	if (BP_CHARACTER_ANIM.Succeeded())
 	{
 		GetMesh()->SetAnimInstanceClass(BP_CHARACTER_ANIM.Class);
+	}
+	
+	FireSound = CreateDefaultSubobject<USoundCue>(TEXT("FIRESOUND"));
+	static ConstructorHelpers::FObjectFinder<USoundCue> SC_FIRESOUND(TEXT("SoundCue'/Game/Asset/Sound/Shot/AR_Shot_Cue.AR_Shot_Cue'"));
+	if (SC_FIRESOUND.Succeeded())
+	{
+		FireSound = SC_FIRESOUND.Object;
 	}
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SPRINGARM"));
@@ -75,6 +84,13 @@ ATPSCharacter::ATPSCharacter()
 		JumpAction = IA_Jump.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_Fire
+	(TEXT("/Game/Input/IA_Fire.IA_Fire"));
+	if (true == IA_Fire.Succeeded())
+	{
+		FireAction = IA_Fire.Object;
+	}
+
 }
 
 // Called when the game starts or when spawned
@@ -109,6 +125,7 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATPSCharacter::Move);
 		EnhancedInputComponent->BindAction(SightAction, ETriggerEvent::Triggered, this, &ATPSCharacter::Sight);
 		//EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ATPSCharacter::Fire);
 	}
 
 }
@@ -140,6 +157,19 @@ void ATPSCharacter::Sight(const FInputActionValue& Value)
 		AddControllerPitchInput(MovementVector.Y * -1.0f /** GetWorld()->DeltaTimeSeconds*/);
 
 		//UE_LOG(LogTemp, Warning, TEXT("Input SightAction"));
+	}
+}
+
+void ATPSCharacter::Fire(const FInputActionValue& Value)
+{
+	if (true == Value.Get<bool>())
+	{
+		if (nullptr != FireSound)
+		{
+			UGameplayStatics::PlaySound2D(this, FireSound);
+		}
+
+		//UE_LOG(LogTemp, Warning, TEXT("Input FireAction"));
 	}
 }
 

@@ -34,6 +34,7 @@ public:
 protected:
 	void Move(const FInputActionValue& Value);
 	void Sight(const FInputActionValue& Value);
+	void Fire(const FInputActionValue& Value);
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -41,6 +42,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	UCameraComponent* Camera;
+
+	UPROPERTY(VisibleAnywhere, Category = Sound)
+	class USoundCue* FireSound;
 
 	// ют╥б
 	UPROPERTY(VisibleAnywhere, Category = Input)
@@ -54,5 +58,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputAction* JumpAction;
+
+	UPROPERTY(VisibleAnywhere, Category = Input)
+	class UInputAction* FireAction;
 
 };
