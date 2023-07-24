@@ -6,8 +6,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
 #include "TPSAnimInstance.h"
-#include "Sound/SoundCue.h"
-#include "Kismet/GameplayStatics.h"
+#include "TPSWeapon.h"
 
 // Sets default values
 ATPSCharacter::ATPSCharacter()
@@ -27,13 +26,6 @@ ATPSCharacter::ATPSCharacter()
 	if (BP_CHARACTER_ANIM.Succeeded())
 	{
 		GetMesh()->SetAnimInstanceClass(BP_CHARACTER_ANIM.Class);
-	}
-	
-	FireSound = CreateDefaultSubobject<USoundCue>(TEXT("FIRESOUND"));
-	static ConstructorHelpers::FObjectFinder<USoundCue> SC_FIRESOUND(TEXT("SoundCue'/Game/Asset/Sound/Shot/AR_Shot_Cue.AR_Shot_Cue'"));
-	if (SC_FIRESOUND.Succeeded())
-	{
-		FireSound = SC_FIRESOUND.Object;
 	}
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SPRINGARM"));
@@ -106,6 +98,14 @@ void ATPSCharacter::BeginPlay()
 		}
 	}
 
+	FName WeaponSocket(TEXT("Weapon_socket"));
+	CurWeapon = GetWorld()->SpawnActor<ATPSWeapon>(FVector::ZeroVector, FRotator::ZeroRotator);
+	if (nullptr != CurWeapon)
+	{
+		CurWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, WeaponSocket);
+		CurWeapon->SetOwner(this);
+	}
+
 }
 
 // Called every frame
@@ -164,9 +164,9 @@ void ATPSCharacter::Fire(const FInputActionValue& Value)
 {
 	if (true == Value.Get<bool>())
 	{
-		if (nullptr != FireSound)
+		if (nullptr != CurWeapon)
 		{
-			UGameplayStatics::PlaySound2D(this, FireSound);
+			CurWeapon->Fire();
 		}
 
 		//UE_LOG(LogTemp, Warning, TEXT("Input FireAction"));

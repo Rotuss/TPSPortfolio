@@ -43,8 +43,11 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	UCameraComponent* Camera;
 
-	UPROPERTY(VisibleAnywhere, Category = Sound)
-	class USoundCue* FireSound;
+	UPROPERTY(VisibleAnywhere, Category = Weapon)
+	USkeletalMeshComponent* Weapon;
+
+	UPROPERTY()
+	class ATPSWeapon* CurWeapon;
 
 	// ют╥б
 	UPROPERTY(VisibleAnywhere, Category = Input)
