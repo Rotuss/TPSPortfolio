@@ -35,4 +35,10 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Effect)
 	UParticleSystem* MuzzleFlashEffect;
+
+	UPROPERTY(VisibleAnywhere, Category = Effect)
+	UParticleSystem* ImpactParticleEffect;
+
+	UPROPERTY(VisibleAnywhere, Category = Effect)
+	UParticleSystem* BeamParticleEffect;
 };
