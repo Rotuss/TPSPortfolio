@@ -169,6 +169,13 @@ void ATPSCharacter::Fire(const FInputActionValue& Value)
 			CurWeapon->Fire();
 		}
 
+		auto AnimInstance = Cast<UTPSAnimInstance>(GetMesh()->GetAnimInstance());
+		if (nullptr == AnimInstance)
+		{
+			return;
+		}
+
+		AnimInstance->PlayFireMontage();
 		//UE_LOG(LogTemp, Warning, TEXT("Input FireAction"));
 	}
 }

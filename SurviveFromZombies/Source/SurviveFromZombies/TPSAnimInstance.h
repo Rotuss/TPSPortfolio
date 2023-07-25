@@ -24,7 +24,8 @@ protected:
 private:
 
 public:
-	
+	void PlayFireMontage();
+
 protected:
 
 private:
@@ -39,4 +40,7 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = State, meta = (AllowPrivateAccess = true))
 	bool IsJumping;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
+	UAnimMontage* FireMontage;
 };

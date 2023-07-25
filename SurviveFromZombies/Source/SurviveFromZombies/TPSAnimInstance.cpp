@@ -11,6 +11,12 @@ UTPSAnimInstance::UTPSAnimInstance()
 	IsMoving = false;
 	IsJumping = false;
 	
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> FIRE_MONTAGE(TEXT("AnimMontage'/Game/Character/Animation/FireMontage.FireMontage'"));
+	if (FIRE_MONTAGE.Succeeded())
+	{
+		FireMontage = FIRE_MONTAGE.Object;
+	}
+
 }
 
 void UTPSAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -33,4 +39,12 @@ void UTPSAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		}
 	}
 	
+}
+
+void UTPSAnimInstance::PlayFireMontage()
+{
+	if (false == Montage_IsPlaying(FireMontage))
+	{
+		Montage_Play(FireMontage);
+	}
 }
