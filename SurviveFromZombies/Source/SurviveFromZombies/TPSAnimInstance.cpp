@@ -38,6 +38,7 @@ void UTPSAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			Speed = Velocity.Size2D();
 			IsMoving = Speed > 0.0f ? true : false;
 			IsJumping = Character->GetMovementComponent()->IsFalling();
+			IsAiming = Character->GetAiming();
 
 			// 회전 -180 -> 180 전환을 예방하기 위해, FRotator로 변수 저장
 			// NormalizedDeltaRotator를 이용하여 반환된 FRotator의 Yaw 이용

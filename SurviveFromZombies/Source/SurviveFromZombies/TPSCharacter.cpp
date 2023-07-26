@@ -10,6 +10,11 @@
 
 // Sets default values
 ATPSCharacter::ATPSCharacter()
+	: bAiming(false)
+	, CameraFOV(0.0f)
+	, CameraZoomFOV(30.0f)
+	, CameraCurrentFOV(0.0f)
+	, ZoomInterpSpeed(30.0f)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -30,8 +35,7 @@ ATPSCharacter::ATPSCharacter()
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SPRINGARM"));
 	SpringArm->SetupAttachment(GetCapsuleComponent());
-	SpringArm->TargetArmLength = 300.0f;
-	//SpringArm->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, 100.0f), FRotator(0.0f, -40.0f, 0.0f));
+	SpringArm->TargetArmLength = 200.0f;
 	SpringArm->SetRelativeLocation(FVector(0.0f, 50.0f, 80.0f));
 	SpringArm->SetRelativeRotation(FRotator(0.0f, -30.0f, 0.0f));
 	SpringArm->bUsePawnControlRotation = true;
@@ -85,6 +89,13 @@ ATPSCharacter::ATPSCharacter()
 	{
 		FireAction = IA_Fire.Object;
 	}
+	
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_Aim
+	(TEXT("/Game/Input/IA_Aim.IA_Aim"));
+	if (true == IA_Aim.Succeeded())
+	{
+		AimAction = IA_Aim.Object;
+	}
 
 }
 
@@ -99,6 +110,13 @@ void ATPSCharacter::BeginPlay()
 		{
 			SubSystem->AddMappingContext(TPSContext, 0);
 		}
+	}
+
+	if (nullptr != Camera)
+	{
+		// 초기값 세팅
+		CameraFOV = GetCamera()->FieldOfView;
+		CameraCurrentFOV = CameraFOV;
 	}
 
 	FName WeaponSocket(TEXT("Weapon_socket"));
@@ -116,6 +134,8 @@ void ATPSCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// Aiming InterpTo
+	AimingInterpZoom(DeltaTime);
 }
 
 // Called to bind functionality to input
@@ -129,6 +149,8 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		EnhancedInputComponent->BindAction(SightAction, ETriggerEvent::Triggered, this, &ATPSCharacter::Sight);
 		//EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ATPSCharacter::Fire);
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &ATPSCharacter::AimingStart);
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &ATPSCharacter::AimingEnd);
 	}
 
 }
@@ -181,5 +203,33 @@ void ATPSCharacter::Fire(const FInputActionValue& Value)
 		AnimInstance->PlayFireMontage();
 		//UE_LOG(LogTemp, Warning, TEXT("Input FireAction"));
 	}
+}
+
+void ATPSCharacter::AimingStart()
+{
+	bAiming = true;
+
+}
+
+void ATPSCharacter::AimingEnd()
+{
+	bAiming = false;
+
+}
+
+void ATPSCharacter::AimingInterpZoom(float DeltaTime)
+{
+	if (true == bAiming)
+	{
+		// 현재 카메라FOV에서 CameraZoomFOV로 Interp
+		CameraCurrentFOV = FMath::FInterpTo(CameraCurrentFOV, CameraZoomFOV, DeltaTime, ZoomInterpSpeed);
+	}
+	else
+	{
+		// 현재 카메라FOV에서 CameraFOV로 Interp
+		CameraCurrentFOV = FMath::FInterpTo(CameraCurrentFOV, CameraFOV, DeltaTime, ZoomInterpSpeed);
+	}
+
+	GetCamera()->SetFieldOfView(CameraCurrentFOV);
 }
 

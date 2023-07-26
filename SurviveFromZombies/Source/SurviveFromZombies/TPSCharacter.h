@@ -31,10 +31,16 @@ public:
 	FORCEINLINE USpringArmComponent* GetSpringArm() const { return SpringArm; }
 	FORCEINLINE UCameraComponent* GetCamera() const { return Camera; }
 
+	FORCEINLINE bool GetAiming() const { return bAiming; }
+
 protected:
 	void Move(const FInputActionValue& Value);
 	void Sight(const FInputActionValue& Value);
 	void Fire(const FInputActionValue& Value);
+
+	void AimingStart();
+	void AimingEnd();
+	void AimingInterpZoom(float DeltaTime);
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -48,6 +54,17 @@ private:
 
 	UPROPERTY()
 	class ATPSWeapon* CurWeapon;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, meta = (AllowPrivateAccess = true))
+	bool bAiming;
+
+	// 카메라 field of view
+	float CameraFOV;
+	float CameraZoomFOV;
+	float CameraCurrentFOV;
+
+	// Aiming시 줌 스피드
+	float ZoomInterpSpeed;
 
 	// 입력
 	UPROPERTY(VisibleAnywhere, Category = Input)
@@ -64,5 +81,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Input)
 	class UInputAction* FireAction;
+
+	UPROPERTY(VisibleAnywhere, Category = Input)
+	class UInputAction* AimAction;
 
 };
