@@ -26,6 +26,8 @@ public:
 public:
 	void Fire();
 
+	bool GetHitEndLocation(const FVector& MuzzleSocketLocation, FVector& HitEndLocation);
+
 private:
 	UPROPERTY(EditAnywhere, Category = Mesh)
 	USkeletalMeshComponent* WeaponMeshComp;

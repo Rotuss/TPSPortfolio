@@ -31,6 +31,9 @@ ATPSCharacter::ATPSCharacter()
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SPRINGARM"));
 	SpringArm->SetupAttachment(GetCapsuleComponent());
 	SpringArm->TargetArmLength = 300.0f;
+	//SpringArm->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, 100.0f), FRotator(0.0f, -40.0f, 0.0f));
+	SpringArm->SetRelativeLocation(FVector(0.0f, 50.0f, 80.0f));
+	SpringArm->SetRelativeRotation(FRotator(0.0f, -30.0f, 0.0f));
 	SpringArm->bUsePawnControlRotation = true;
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("CAMERA"));
@@ -39,10 +42,10 @@ ATPSCharacter::ATPSCharacter()
 
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
+	bUseControllerRotationYaw = true;
 
 	// 무브먼트 방향으로 회전 조정
-	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->bOrientRotationToMovement = false;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
 	GetCharacterMovement()->JumpZVelocity = 600.0f;
 	GetCharacterMovement()->AirControl = 0.2f;
