@@ -3,11 +3,13 @@
 
 #include "TPSAnimInstance.h"
 #include "TPSCharacter.h"
+#include "Kismet/KismetMathLibrary.h"
 
 UTPSAnimInstance::UTPSAnimInstance()
 {
 	Velocity = FVector::ZeroVector;
 	Speed = 0.0f;
+	Direction = 0.0f;
 	IsMoving = false;
 	IsJumping = false;
 	
@@ -36,6 +38,12 @@ void UTPSAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			Speed = Velocity.Size2D();
 			IsMoving = Speed > 0.0f ? true : false;
 			IsJumping = Character->GetMovementComponent()->IsFalling();
+
+			// 회전 -180 -> 180 전환을 예방하기 위해, FRotator로 변수 저장
+			// NormalizedDeltaRotator를 이용하여 반환된 FRotator의 Yaw 이용
+			FRotator AnimRotation = Character->GetBaseAimRotation();
+			FRotator MovementRotation = UKismetMathLibrary::MakeRotFromX(Velocity);
+			Direction = UKismetMathLibrary::NormalizedDeltaRotator(MovementRotation, AnimRotation).Yaw;
 		}
 	}
 	
