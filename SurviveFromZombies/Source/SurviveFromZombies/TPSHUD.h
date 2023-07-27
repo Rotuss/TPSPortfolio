@@ -20,9 +20,23 @@ public:
 	virtual void DrawHUD() override;
 
 protected:
+	virtual void BeginPlay() override;
+
 	UPROPERTY(EditDefaultsOnly)
-	UTexture2D* CrosshairTexture;
+	UTexture2D* CrosshairTopTexture;
+
+	UPROPERTY(EditDefaultsOnly)
+	UTexture2D* CrosshairBottomTexture;
+
+	UPROPERTY(EditDefaultsOnly)
+	UTexture2D* CrosshairLeftTexture;
+
+	UPROPERTY(EditDefaultsOnly)
+	UTexture2D* CrosshairRightTexture;
 
 private:
+	class ATPSCharacter* Character;
 
+	float CrossHairSpread;
+	float CrossHairSpreadMax;
 };

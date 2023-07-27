@@ -15,6 +15,13 @@ ATPSCharacter::ATPSCharacter()
 	, CameraZoomFOV(30.0f)
 	, CameraCurrentFOV(0.0f)
 	, ZoomInterpSpeed(30.0f)
+	, CrossHairSpread(0.0f)
+	, CrossHairVelocity(0.0f)
+	, CrossHairAim(0.0f)
+	, CrossHairFire(0.0f)
+	, CrossHairFireTimer()
+	, bFiring(false)
+	, FireTimeDuration(0.05f)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -136,6 +143,9 @@ void ATPSCharacter::Tick(float DeltaTime)
 
 	// Aiming InterpTo
 	AimingInterpZoom(DeltaTime);
+
+	// 크로스헤어 확산 연산
+	CalculateCrossHairSpread(DeltaTime);
 }
 
 // Called to bind functionality to input
@@ -192,6 +202,7 @@ void ATPSCharacter::Fire(const FInputActionValue& Value)
 		if (nullptr != CurWeapon)
 		{
 			CurWeapon->Fire();
+			StartCrossHairFire();
 		}
 
 		auto AnimInstance = Cast<UTPSAnimInstance>(GetMesh()->GetAnimInstance());
@@ -231,5 +242,56 @@ void ATPSCharacter::AimingInterpZoom(float DeltaTime)
 	}
 
 	GetCamera()->SetFieldOfView(CameraCurrentFOV);
+}
+
+void ATPSCharacter::CalculateCrossHairSpread(float DeltaTime)
+{
+	// Input
+	FVector2D WalkSpeedRange = FVector2D(0.0f, 600.0f);
+	// Output
+	FVector2D VelocityRange = FVector2D(0.0f, 1.0f);
+	FVector Velocity = GetVelocity();
+	Velocity.Z = 0.0f;
+
+	// Input(WalkSpeedRange)에 대해 Output(VelocityRange) 백분율로 반환(0~600을 0~1로 비율 연산)
+	CrossHairVelocity = FMath::GetMappedRangeValueClamped(WalkSpeedRange, VelocityRange, Velocity.Size());
+
+	// 조준상태에 따른 크로스헤어 효과
+	if (true == bAiming)
+	{
+		// 크로스헤어 축소
+		CrossHairAim = FMath::FInterpTo(CrossHairAim, 0.5f, DeltaTime, 30.0f);
+	}
+	else
+	{
+		// 기존 크로스헤어로 복구
+		CrossHairAim = FMath::FInterpTo(CrossHairAim, 0.0f, DeltaTime, 30.0f);
+	}
+
+	// SetTimer 지정 시간 이후, 크로스헤어 일시적 풀림 효과
+	if (true == bFiring)
+	{
+		CrossHairFire = FMath::FInterpTo(CrossHairFire, 0.3f, DeltaTime, 60.0f);
+	}
+	else
+	{
+		CrossHairFire = FMath::FInterpTo(CrossHairFire, 0.0f, DeltaTime, 60.0f);
+	}
+
+	// 움직임에 따른 크로스헤어 최종 결과 연산
+	CrossHairSpread = 0.5f + CrossHairVelocity - CrossHairAim + CrossHairFire;
+}
+
+void ATPSCharacter::StartCrossHairFire()
+{
+	bFiring = true;
+
+	// FireTimeDuration뒤 &ATPSCharacter::FinishCrossHairFire 호출
+	GetWorldTimerManager().SetTimer(CrossHairFireTimer, this, &ATPSCharacter::FinishCrossHairFire, FireTimeDuration);
+}
+
+void ATPSCharacter::FinishCrossHairFire()
+{
+	bFiring = false;
 }
 
