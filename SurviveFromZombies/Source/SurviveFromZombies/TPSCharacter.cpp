@@ -22,6 +22,10 @@ ATPSCharacter::ATPSCharacter()
 	, CrossHairFireTimer()
 	, bFiring(false)
 	, FireTimeDuration(0.05f)
+	, AutoFireTimer()
+	, bFiringKey(false)
+	, bShouldFire(true)
+	, AutoFireRate(0.1f)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -158,7 +162,9 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATPSCharacter::Move);
 		EnhancedInputComponent->BindAction(SightAction, ETriggerEvent::Triggered, this, &ATPSCharacter::Sight);
 		//EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ATPSCharacter::Fire);
+		//EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ATPSCharacter::Fire);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ATPSCharacter::FireStart);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &ATPSCharacter::FireEnd);
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &ATPSCharacter::AimingStart);
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &ATPSCharacter::AimingEnd);
 	}
@@ -195,36 +201,61 @@ void ATPSCharacter::Sight(const FInputActionValue& Value)
 	}
 }
 
-void ATPSCharacter::Fire(const FInputActionValue& Value)
+void ATPSCharacter::Fire(/*const FInputActionValue& Value*/)
 {
+	if (nullptr != CurWeapon)
+	{
+		CurWeapon->Fire();
+		StartCrossHairFire();
+	}
+
+	auto AnimInstance = Cast<UTPSAnimInstance>(GetMesh()->GetAnimInstance());
+	if (nullptr == AnimInstance)
+	{
+		return;
+	}
+
+	AnimInstance->PlayFireMontage();
+	//UE_LOG(LogTemp, Warning, TEXT("Input FireAction"));
+}
+
+void ATPSCharacter::FireStart(const FInputActionValue& Value)
+{
+	// fire 키가 눌렸을 때
 	if (true == Value.Get<bool>())
 	{
-		if (nullptr != CurWeapon)
-		{
-			CurWeapon->Fire();
-			StartCrossHairFire();
-		}
-
-		auto AnimInstance = Cast<UTPSAnimInstance>(GetMesh()->GetAnimInstance());
-		if (nullptr == AnimInstance)
-		{
-			return;
-		}
-
-		AnimInstance->PlayFireMontage();
-		//UE_LOG(LogTemp, Warning, TEXT("Input FireAction"));
+		// 현재 fire 중이라고 bFiringKey를 true로 설정
+		bFiringKey = true;
+		// fire 시작 타이머 호출
+		FireStartTimer();
 	}
 }
 
-void ATPSCharacter::AimingStart()
+void ATPSCharacter::FireEnd(const FInputActionValue& Value)
 {
-	bAiming = true;
+	// fire 키가 해제됐을 때
+	if (false == Value.Get<bool>())
+	{
+		// 현재 fire 중이 아니라고 bFiringKey를 false로 설정
+		bFiringKey = false;
+	}
+}
+
+void ATPSCharacter::AimingStart(const FInputActionValue& Value)
+{
+	if (true == Value.Get<bool>())
+	{
+		bAiming = true;
+	}
 
 }
 
-void ATPSCharacter::AimingEnd()
+void ATPSCharacter::AimingEnd(const FInputActionValue& Value)
 {
-	bAiming = false;
+	if (false == Value.Get<bool>())
+	{
+		bAiming = false;
+	}
 
 }
 
@@ -293,5 +324,32 @@ void ATPSCharacter::StartCrossHairFire()
 void ATPSCharacter::FinishCrossHairFire()
 {
 	bFiring = false;
+}
+
+void ATPSCharacter::FireStartTimer()
+{
+	// 처음 fire가 시작되고 fire가 가능한 상태일 때 true
+	if (true == bShouldFire)
+	{
+		// fire 실행
+		Fire();
+		// fire를 실행했으므로 fire가 가능한지 체크하는 bShouldFire를 false로 전환
+		bShouldFire = false;
+		// AutoFireRate뒤 &ATPSCharacter::AutoFireReset 호출
+		GetWorldTimerManager().SetTimer(AutoFireTimer, this, &ATPSCharacter::AutoFireReset, AutoFireRate);
+	}
+}
+
+void ATPSCharacter::AutoFireReset()
+{
+	// 타이머 시간이 지났으므로 다시 fire가 가능하다고 bShouldFire를 true로 전환
+	bShouldFire = true;
+	// 타이머 시간이 지났고 다시 fire가 가능한 상태에서 fire 키가 작동중이라면
+	if (true == bFiringKey)
+	{
+		// fire 시작 타이머 호출
+		FireStartTimer();
+	}
+	// 타이머 시간이 지났고 다시 fire가 가능한 상태에서 fire 키가 작동중이 아니라면 fire 실행X
 }
 

@@ -40,15 +40,17 @@ protected:
 	// ====================================================================================================
 	void Move(const FInputActionValue& Value);
 	void Sight(const FInputActionValue& Value);
-	void Fire(const FInputActionValue& Value);
+	void Fire(/*const FInputActionValue& Value*/);
+	void FireStart(const FInputActionValue& Value);
+	void FireEnd(const FInputActionValue& Value);
+	void AimingStart(const FInputActionValue& Value);
+	void AimingEnd(const FInputActionValue& Value);
 	// ====================================================================================================
 
 
 	// ====================================================================================================
 	// Aiming
 	// ====================================================================================================
-	void AimingStart();
-	void AimingEnd();
 	void AimingInterpZoom(float DeltaTime);
 	// ====================================================================================================
 
@@ -63,6 +65,16 @@ protected:
 
 	UFUNCTION()
 	void FinishCrossHairFire();
+	// ====================================================================================================
+
+
+	// ====================================================================================================
+	// 자동연사
+	// ====================================================================================================
+	void FireStartTimer();
+	
+	UFUNCTION()
+	void AutoFireReset();
 	// ====================================================================================================
 
 private:
@@ -80,6 +92,17 @@ private:
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, meta = (AllowPrivateAccess = true))
 	bool bAiming;
+
+
+	// ====================================================================================================
+	// 자동연사
+	// ====================================================================================================
+	// SetTimer을 위한 FTimerHandle, 현재 FireKey가 눌려있는 중인지 확인하는 bool, 현재 Fire가 가능한 상황인지 확인하는 bool, SetTimer에서 함수 호출하기까지의 시간
+	FTimerHandle AutoFireTimer;
+	bool bFiringKey;
+	bool bShouldFire;
+	float AutoFireRate;
+	// ====================================================================================================
 
 
 	// ====================================================================================================
