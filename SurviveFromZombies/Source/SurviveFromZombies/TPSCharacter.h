@@ -27,12 +27,17 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	void IncrementOverlappedItemCount(int Amount);
+	void TraceForItem();
+
 public:
 	FORCEINLINE USpringArmComponent* GetSpringArm() const { return SpringArm; }
 	FORCEINLINE UCameraComponent* GetCamera() const { return Camera; }
 
 	FORCEINLINE bool GetAiming() const { return bAiming; }
 	FORCEINLINE float GetCrossHairSpread() const { return CrossHairSpread; }
+
+	FORCEINLINE int GetOverlappedItemCount() const { return OverlappedItemCount; }
 
 protected:
 	// ====================================================================================================
@@ -136,6 +141,18 @@ private:
 	FTimerHandle CrossHairFireTimer;
 	bool bFiring;
 	float FireTimeDuration;
+	// ====================================================================================================
+
+	// ====================================================================================================
+	// 아이템 위젯 상호작용
+	// ====================================================================================================
+	UPROPERTY(VisibleAnywhere, Category = Item)
+	class ATPSItem* TraceItemLastFrame;
+	
+	// 아이템 상호작용 가능 여부를 파악하기 위한 bool
+	bool bShouldTraceForItem;
+	// 오버랩 된 아이템 수 파악을 위한 int
+	int OverlappedItemCount;
 	// ====================================================================================================
 
 

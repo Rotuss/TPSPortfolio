@@ -3,15 +3,15 @@
 #pragma once
 
 #include "SurviveFromZombies.h"
-#include "GameFramework/Actor.h"
+#include "TPSItem.h"
 #include "TPSWeapon.generated.h"
 
 UCLASS()
-class SURVIVEFROMZOMBIES_API ATPSWeapon : public AActor
+class SURVIVEFROMZOMBIES_API ATPSWeapon : public ATPSItem
 {
 	GENERATED_BODY()
 	
-public:	
+public:
 	// Sets default values for this actor's properties
 	ATPSWeapon();
 
@@ -19,7 +19,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -27,6 +27,7 @@ public:
 	void Fire();
 
 	bool GetHitEndLocation(const FVector& MuzzleSocketLocation, FVector& HitEndLocation);
+	bool GetCrossHairImpactPoint(FHitResult& OutHitResult, FVector& OutHitLocation);
 
 private:
 	UPROPERTY(EditAnywhere, Category = Mesh)

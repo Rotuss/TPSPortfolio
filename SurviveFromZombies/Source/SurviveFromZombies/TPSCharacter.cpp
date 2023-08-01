@@ -7,6 +7,7 @@
 #include "InputMappingContext.h"
 #include "TPSAnimInstance.h"
 #include "TPSWeapon.h"
+#include "Components/WidgetComponent.h"
 
 // Sets default values
 ATPSCharacter::ATPSCharacter()
@@ -26,6 +27,7 @@ ATPSCharacter::ATPSCharacter()
 	, bFiringKey(false)
 	, bShouldFire(true)
 	, AutoFireRate(0.1f)
+	, bShouldTraceForItem(false)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -150,6 +152,9 @@ void ATPSCharacter::Tick(float DeltaTime)
 
 	// 크로스헤어 확산 연산
 	CalculateCrossHairSpread(DeltaTime);
+
+	// 아이템 위젯 상호작용
+	TraceForItem();
 }
 
 // Called to bind functionality to input
@@ -169,6 +174,60 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &ATPSCharacter::AimingEnd);
 	}
 
+}
+
+// 아이템 중첩 확인
+void ATPSCharacter::IncrementOverlappedItemCount(int Amount)
+{
+	// 오버랩 된 아이템이 0 이하
+	if (0 >= OverlappedItemCount + Amount)
+	{
+		// 현재 오버랩된 아이템 수를 0으로 초기화, 상호작용 못하게 bShouldTraceForItem를 false
+		OverlappedItemCount = 0;
+		bShouldTraceForItem = false;
+	}
+	// 오버랩 된 아이템이 존재
+	else
+	{
+		// 현재 오버랩된 아이템 수 연산, 상호작용 가능하게 bShouldTraceForItem를 true
+		OverlappedItemCount += Amount;
+		bShouldTraceForItem = true;
+	}
+}
+
+void ATPSCharacter::TraceForItem()
+{
+	if (true == bShouldTraceForItem)
+	{
+		FHitResult ItemTraceResult;
+		FVector HitLocation;
+		// 아이템과 크로스헤어 hit 확인
+		CurWeapon->GetCrossHairImpactPoint(ItemTraceResult, HitLocation);
+		if (true == ItemTraceResult.bBlockingHit)
+		{
+			// hit된 액터가 ATPItem인지 확인
+			ATPSItem* HitItem = Cast<ATPSItem>(ItemTraceResult.GetActor());
+			// 아이템 히트가 맞고 위젯이 존재하고 아이템이 현재 착용중인 무기가 아닐 경우
+			if (nullptr != HitItem && nullptr != HitItem->GetPickUpItemWidget() && CurWeapon != HitItem)
+			{
+				// 위젯 보이기
+				HitItem->GetPickUpItemWidget()->SetVisibility(true);
+			}
+
+			if (nullptr != TraceItemLastFrame)
+			{
+				if (HitItem != TraceItemLastFrame)
+				{
+					TraceItemLastFrame->GetPickUpItemWidget()->SetVisibility(false);
+				}
+			}
+			TraceItemLastFrame = HitItem;
+		}
+	}
+	else if (nullptr != TraceItemLastFrame)
+	{
+		TraceItemLastFrame->GetPickUpItemWidget()->SetVisibility(false);
+	}
 }
 
 void ATPSCharacter::Move(const FInputActionValue& Value)
