@@ -26,6 +26,12 @@ public:
 public:
 	FORCEINLINE class UWidgetComponent* GetPickUpItemWidget() const { return PickUpItemWidget; }
 
+	UPROPERTY(EditAnywhere, Category = Item)
+	FString ItemName;
+
+	UPROPERTY(EditAnywhere, Category = Item)
+	FString ItemInfo;
+
 protected:
 	UFUNCTION()
 	void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

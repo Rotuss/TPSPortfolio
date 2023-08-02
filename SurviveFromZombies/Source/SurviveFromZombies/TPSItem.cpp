@@ -3,10 +3,13 @@
 
 #include "TPSItem.h"
 #include "TPSCharacter.h"
+#include "UI_TPSPickUpItem.h"
 #include "Components/WidgetComponent.h"
 
 // Sets default values
 ATPSItem::ATPSItem()
+	: ItemName(FString("Name"))
+	, ItemInfo(FString("Info"))
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -46,6 +49,11 @@ void ATPSItem::BeginPlay()
 	SphereCollision->OnComponentEndOverlap.AddDynamic(this, &ATPSItem::OnSphereEndOverlap);
 
 	PickUpItemWidget->SetVisibility(false);
+	auto TPSPickUpWidget = Cast<UUI_TPSPickUpItem>(PickUpItemWidget->GetUserWidgetObject());
+	if (nullptr != TPSPickUpWidget)
+	{
+		TPSPickUpWidget->TPSItemRef = this;
+	}
 }
 
 // Called every frame
