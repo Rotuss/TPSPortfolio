@@ -3,11 +3,12 @@
 
 #include "SFZGameMode.h"
 #include "TPSCharacter.h"
+#include "TPSPlayerController.h"
 #include "TPSHUD.h"
 
 ASFZGameMode::ASFZGameMode()
 {
 	DefaultPawnClass = ATPSCharacter::StaticClass();
-	//PlayerControllerClass = ;
+	PlayerControllerClass = ATPSPlayerController::StaticClass();
 	HUDClass = ATPSHUD::StaticClass();
 }

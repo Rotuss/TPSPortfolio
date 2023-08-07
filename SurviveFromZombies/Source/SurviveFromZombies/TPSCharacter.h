@@ -33,6 +33,7 @@ public:
 public:
 	FORCEINLINE USpringArmComponent* GetSpringArm() const { return SpringArm; }
 	FORCEINLINE UCameraComponent* GetCamera() const { return Camera; }
+	FORCEINLINE class ATPSWeapon* GetCurrentWeapon() const { return CurWeapon; }
 
 	FORCEINLINE bool GetAiming() const { return bAiming; }
 	FORCEINLINE float GetCrossHairSpread() const { return CrossHairSpread; }
@@ -81,6 +82,8 @@ protected:
 	UFUNCTION()
 	void AutoFireReset();
 	// ====================================================================================================
+
+	bool IsWeaponAmmo();
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)

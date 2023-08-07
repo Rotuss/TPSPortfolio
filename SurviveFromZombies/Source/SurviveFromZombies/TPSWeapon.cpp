@@ -7,6 +7,9 @@
 
 // Sets default values
 ATPSWeapon::ATPSWeapon()
+	: MaxRifleAmmo(100)
+	, CurrentRifleAmmo()
+	, Ammo()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -46,6 +49,8 @@ ATPSWeapon::ATPSWeapon()
 		FireSound = SC_FIRESOUND.Object;
 	}
 
+	// 임시로 MaxAmmo와 CurrentAmmo를 확인하기 위한 설정
+	Ammo = MaxRifleAmmo;
 }
 
 // Called when the game starts or when spawned
@@ -53,6 +58,8 @@ void ATPSWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Ammo 수량 초기화
+	InitMapAmmo();
 }
 
 // Called every frame
@@ -103,6 +110,9 @@ void ATPSWeapon::Fire()
 		UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BeamParticleEffect, ItemMeshComp->GetSocketTransform(TEXT("MuzzleflashSocket")));
 		Beam->SetVectorParameter(TEXT("Target"), HitEnd);
 	}
+
+	// Ammo가 0보다 크면 Ammo 감소 0이하면 0
+	Ammo = 0 < Ammo ? Ammo - 1 : 0;
 }
 
 bool ATPSWeapon::GetHitEndLocation(const FVector& MuzzleSocketLocation, FVector& HitEndLocation)
@@ -212,5 +222,10 @@ bool ATPSWeapon::GetCrossHairImpactPoint(FHitResult& OutHitResult, FVector& OutH
 	}
 
 	return false;
+}
+
+void ATPSWeapon::InitMapAmmo()
+{
+	MapAmmo.Add(EAmmoType::AR, MaxRifleAmmo);
 }
 

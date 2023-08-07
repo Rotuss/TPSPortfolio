@@ -280,8 +280,8 @@ void ATPSCharacter::Fire(/*const FInputActionValue& Value*/)
 
 void ATPSCharacter::FireStart(const FInputActionValue& Value)
 {
-	// fire 키가 눌렸을 때
-	if (true == Value.Get<bool>())
+	// fire 키가 눌렸을 때 && Ammo가 0보다 클 때
+	if (true == Value.Get<bool>() && true == IsWeaponAmmo())
 	{
 		// 현재 fire 중이라고 bFiringKey를 true로 설정
 		bFiringKey = true;
@@ -401,14 +401,28 @@ void ATPSCharacter::FireStartTimer()
 
 void ATPSCharacter::AutoFireReset()
 {
-	// 타이머 시간이 지났으므로 다시 fire가 가능하다고 bShouldFire를 true로 전환
-	bShouldFire = true;
-	// 타이머 시간이 지났고 다시 fire가 가능한 상태에서 fire 키가 작동중이라면
-	if (true == bFiringKey)
+	// Ammo가 0보다 클 때(== 쏠 수 있을 때)
+	if (true == IsWeaponAmmo())
 	{
-		// fire 시작 타이머 호출
-		FireStartTimer();
+		// 타이머 시간이 지났으므로 다시 fire가 가능하다고 bShouldFire를 true로 전환
+		bShouldFire = true;
+		// 타이머 시간이 지났고 다시 fire가 가능한 상태에서 fire 키가 작동중이라면
+		if (true == bFiringKey)
+		{
+			// fire 시작 타이머 호출
+			FireStartTimer();
+		}
+		// 타이머 시간이 지났고 다시 fire가 가능한 상태에서 fire 키가 작동중이 아니라면 fire 실행X
 	}
-	// 타이머 시간이 지났고 다시 fire가 가능한 상태에서 fire 키가 작동중이 아니라면 fire 실행X
+}
+
+bool ATPSCharacter::IsWeaponAmmo()
+{
+	if (nullptr != CurWeapon)
+	{
+		return CurWeapon->GetAmmo() > 0;
+	}
+	
+	return false;
 }
 

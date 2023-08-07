@@ -6,6 +6,15 @@
 #include "TPSItem.h"
 #include "TPSWeapon.generated.h"
 
+// AmmoType Enum class
+UENUM(BlueprintType)
+enum class EAmmoType : uint8
+{
+	AR UMETA(DisplayName = "RIFLE"),
+
+	MAX UMETA(DisplayName = "MAX")
+};
+
 UCLASS()
 class SURVIVEFROMZOMBIES_API ATPSWeapon : public ATPSItem
 {
@@ -24,6 +33,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
+	FORCEINLINE int GetAmmo() const { return Ammo; }
+	FORCEINLINE int GetMaxAmmo() const { return MaxRifleAmmo; }
+
 	void Fire();
 
 	bool GetHitEndLocation(const FVector& MuzzleSocketLocation, FVector& HitEndLocation);
@@ -44,4 +56,19 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Effect)
 	UParticleSystem* BeamParticleEffect;
+
+	// AmmoType과 AmmoType에 따른 Ammo 수량
+	UPROPERTY(VisibleAnywhere, Category = Ammo)
+	TMap<EAmmoType, int> MapAmmo;
+
+	UPROPERTY(VisibleAnywhere, Category = Ammo)
+	int Ammo;
+
+	UPROPERTY(VisibleAnywhere, Category = Ammo)
+	int MaxRifleAmmo;
+
+	UPROPERTY(VisibleAnywhere, Category = Ammo)
+	int CurrentRifleAmmo;
+
+	void InitMapAmmo();
 };
